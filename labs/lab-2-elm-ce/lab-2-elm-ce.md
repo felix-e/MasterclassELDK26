@@ -159,7 +159,7 @@ To finish the lab, turn to your sideperson and discuss or reflect over the follo
 
 
 ```
-
+# Lab 2.6
 # Connect to Microsoft Graph with permissions needed to:
 # - read service principals
 # - assign Microsoft Graph application permissions
