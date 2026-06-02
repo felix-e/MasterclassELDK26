@@ -104,7 +104,7 @@ Once the source code is copied in, open the designer in logic apps and make sure
 Once all the above steps are completed don't forget to hit **save** on the logic app and proceed to the next lab exercise.
 
 &nbsp;
-# json file summary
+### json file summary
 Access package granted  
 → Logic App receives HTTP callback  
 → Checks catalog ID  
