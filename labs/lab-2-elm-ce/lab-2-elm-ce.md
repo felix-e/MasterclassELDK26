@@ -160,7 +160,7 @@ To finish the lab, turn to your sideperson and discuss or reflect over the follo
 
 ```
 
-,# Connect to Microsoft Graph with permissions needed to:
+# Connect to Microsoft Graph with permissions needed to:
 # - read service principals
 # - assign Microsoft Graph application permissions
 # - assign Entra directory roles
