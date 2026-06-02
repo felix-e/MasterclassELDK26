@@ -104,20 +104,20 @@ Once the source code is copied in, open the designer in logic apps and make sure
 Once all the above steps are completed don't forget to hit **save** on the logic app and proceed to the next lab exercise.
 
 &nbsp;
-json file summary
-Access package granted
-→ Logic App receives HTTP callback
-→ Checks catalog ID
-→ Checks stage == assignmentRequestGranted
-→ Gets requester user details from Graph
-→ Builds admin UPN
-→ Builds SCIM BulkRequest payload
-→ POSTs payload to inbound provisioning bulkUpload endpoint
-→ waits 20s
-→ patches new admin account mail
-→ generates TAP
-→ emails TAP to requester
-→ resumes access package request
+# json file summary
+Access package granted  
+→ Logic App receives HTTP callback  
+→ Checks catalog ID  
+→ Checks stage == assignmentRequestGranted  
+→ Gets requester user details from Graph  
+→ Builds admin UPN  
+→ Builds SCIM BulkRequest payload  
+→ POSTs payload to inbound provisioning bulkUpload endpoint  
+→ waits 20s  
+→ patches new admin account mail  
+→ generates TAP  
+→ emails TAP to requester  
+→ resumes access package request  
 
 
 
