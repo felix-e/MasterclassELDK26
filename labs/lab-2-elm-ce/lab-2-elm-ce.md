@@ -155,3 +155,71 @@ To finish the lab, turn to your sideperson and discuss or reflect over the follo
 - What is the reasoning for using Exchange Online Plus addressing on admin accounts?
 - Should access packages being created as well to request individual roles or should role-assignable groups be used within access pacakages?
 - How should the offboarding of privileged accounts be handeld, via lifecycle workflows or access packages?
+
+
+
+```
+
+,# Connect to Microsoft Graph with permissions needed to:
+# - read service principals
+# - assign Microsoft Graph application permissions
+# - assign Entra directory roles
+Connect-MgGraph -Scopes `
+  "Application.Read.All",
+  "AppRoleAssignment.ReadWrite.All",
+  "RoleManagement.ReadWrite.Directory"
+
+# Paste the Object ID from:
+# Logic App → Identity → System assigned → Object ID
+$miId = "473858a0-6c62-4d27-87d2-d12cbc7b8747"
+
+# Retrieve the service principal object for the Logic App's managed identity
+$mi = Get-MgServicePrincipal -ServicePrincipalId $miId
+
+# Confirm Graph found the managed identity correctly
+$mi | Select Id, DisplayName, AppId
+
+# Retrieve the Microsoft Graph service principal
+# AppId 00000003-0000-0000-c000-000000000000 is always Microsoft Graph
+$graphApp = Get-MgServicePrincipal -Filter "appId eq '00000003-0000-0000-c000-000000000000'"
+
+# Define the Microsoft Graph application permissions required by the lab
+$graphScopes = @(
+  "User.ReadWrite.All"
+  "SynchronizationData-User.Upload"
+  "AuditLog.Read.All"
+  "Mail.Send"
+)
+
+# Loop through each required Graph permission
+foreach ($scope in $graphScopes) {
+
+  # Find the matching Graph app role object for this permission
+  $role = $graphApp.AppRoles | Where-Object Value -eq $scope
+
+  # Stop if the permission name is invalid or not found
+  if (-not $role) {
+    throw "Graph app role not found: $scope"
+  }
+
+  # Check whether this permission has already been assigned to the managed identity
+  $existing = Get-MgServicePrincipalAppRoleAssignment -ServicePrincipalId $mi.Id |
+    Where-Object {
+      $_.AppRoleId -eq $role.Id -and
+      $_.ResourceId -eq $graphApp.Id
+    }
+
+  # Assign the permission only if it is not already assigned
+  if (-not $existing) {
+    New-MgServicePrincipalAppRoleAssignment `
+      -ServicePrincipalId $mi.Id `
+      -PrincipalId $mi.Id `
+      -ResourceId $graphApp.Id `
+      -AppRoleId $role.Id
+  }
+  else {
+    "Already assigned: $scope"
+  }
+}
+
+```
