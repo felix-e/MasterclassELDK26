@@ -1,0 +1,18 @@
+@graph = https://graph.microsoft.com/v1.0
+@tenant = lab.keepcove.com
+@spId = 626172aa-1511-4151-bfe1-4b2ad668f77e
+@jobId = API2AAD.8f87362b5dd345dda667cbff144e3863.7ada0b78-05d2-467a-a6c3-1cb6d687762b
+@payload = /Users/felixelliott/Projects/MasterclassELDK26/resources/resource-2-scim-sample-payloads/privileged-user.json
+
+### Auth test - should prompt Microsoft login
+GET {{graph}}/me
+Authorization: Bearer {{$aadV2Token new scopes:https://graph.microsoft.com/User.Read tenantid:{{tenant}}}}
+Content-Type: application/json
+
+
+### Upload privileged user SCIM payload
+POST {{graph}}/servicePrincipals/{{spId}}/synchronization/jobs/{{jobId}}/bulkUpload
+Authorization: Bearer {{$aadV2Token new scopes:SynchronizationData-User.Upload tenantid:{{tenant}}}}
+Content-Type: application/scim+json
+
+< {{payload}}

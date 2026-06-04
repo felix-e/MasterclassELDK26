@@ -1,0 +1,52 @@
+== input ==
+{
+    "uri": "https://graph.microsoft.com/v1.0/identityGovernance/entitlementManagement/assignmentRequests/400c1135-df8a-44d9-b531-5714daa30732/resume",
+    "method": "POST",
+    "headers": {
+        "Content-Type": "application/json"
+    },
+    "authentication": {
+        "audience": "https://graph.microsoft.com",
+        "type": "ManagedServiceIdentity"
+    },
+    "body": {
+        "data": {
+            "customExtensionStageInstanceDetail": "Admin account has been created",
+            "customExtensionStageInstanceId": "6c08b5ce-83f2-4f3a-99ff-179c8f3c8d0e",
+            "stage": "assignmentRequestGranted",
+            "@odata.type": "microsoft.graph.accessPackageAssignmentRequestCallbackData"
+        },
+        "source": "IdentityMan.AdminAccountRequest",
+        "type": "microsoft.graph.accessPackageCustomExtensionStage.assignmentRequestGranted"
+    }
+}
+
+== output ==
+
+{
+    "statusCode": 403,
+    "headers": {
+        "Transfer-Encoding": "chunked",
+        "Location": "https://igaelm-asev3-ecapi-ase.igaelm-asev3-environment-ase.p.azurewebsites.net/api/v1/assignmentRequests('400c1135-df8a-44d9-b531-5714daa30732')/Microsoft.IGAELM.EC.FrontEnd.ExternalModel.resume",
+        "Vary": "Accept-Encoding",
+        "Strict-Transport-Security": "max-age=31536000",
+        "request-id": "c4b03eb2-42fb-466f-8365-320ad8ad69c7",
+        "client-request-id": "c4b03eb2-42fb-466f-8365-320ad8ad69c7",
+        "x-ms-ags-diagnostic": "{\"ServerInfo\":{\"DataCenter\":\"Australia Southeast\",\"Slice\":\"E\",\"Ring\":\"3\",\"ScaleUnit\":\"001\",\"RoleInstance\":\"ML1PEPF0000E51D\"}}",
+        "Date": "Wed, 03 Jun 2026 12:14:17 GMT",
+        "Content-Type": "application/json",
+        "Content-Length": "283"
+    },
+    "body": {
+        "error": {
+            "code": "UnAuthorized",
+            "message": "User is not authorized to perform the operation. Reason: Unauthorized",
+            "details": [],
+            "innerError": {
+                "date": "2026-06-03T12:14:17",
+                "request-id": "c4b03eb2-42fb-466f-8365-320ad8ad69c7",
+                "client-request-id": "c4b03eb2-42fb-466f-8365-320ad8ad69c7"
+            }
+        }
+    }
+}
