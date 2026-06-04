@@ -318,7 +318,7 @@
                                 },
                                 "type": "Http",
                                 "inputs": {
-                                    "uri": "https://graph.microsoft.com/v1.0/users/admin@lab.keepcove.com/sendMail",
+                                    "uri": "https://graph.microsoft.com/v1.0/users/77ca8b96-893b-4f5b-a3f0-369beeaedf5a/sendMail",
                                     "method": "POST",
                                     "body": {
                                         "message": {
@@ -389,7 +389,7 @@
                             },
                             "HTTP_-_Enable_Exchange_Online_plus_addressing": {
                                 "runAfter": {
-                                    "Until_-_Admin_user_exists_in_Graph": [
+                                    "Delay_-_20_seconds": [
                                         "Succeeded"
                                     ]
                                 },
@@ -426,54 +426,6 @@
                                     "interval": {
                                         "count": 120,
                                         "unit": "Second"
-                                    }
-                                }
-                            },
-                            "Until_-_Admin_user_exists_in_Graph": {
-                                "runAfter": {
-                                    "Delay_-_20_seconds": [
-                                        "Succeeded"
-                                    ]
-                                },
-                                "type": "Until",
-                                "expression": "@equals(outputs('HTTP_-_Check_admin_user_exists_in_Graph')?['statusCode'], 200)",
-                                "limit": {
-                                    "count": 20,
-                                    "timeout": "PT10M"
-                                },
-                                "actions": {
-                                    "HTTP_-_Check_admin_user_exists_in_Graph": {
-                                        "runAfter": {},
-                                        "type": "Http",
-                                        "inputs": {
-                                            "uri": "https://graph.microsoft.com/beta/users/@{outputs('Compose_-_UserPrincipalName')}?$select=id,userPrincipalName,displayName,mail,employeeId",
-                                            "method": "GET",
-                                            "authentication": {
-                                                "type": "ManagedServiceIdentity",
-                                                "identity": "/subscriptions/41f018dd-427b-445f-9262-6b32b603662e/resourcegroups/entraLab/providers/Microsoft.ManagedIdentity/userAssignedIdentities/entraLabInstance",
-                                                "audience": "https://graph.microsoft.com"
-                                            }
-                                        },
-                                        "runtimeConfiguration": {
-                                            "contentTransfer": {
-                                                "transferMode": "Chunked"
-                                            }
-                                        }
-                                    },
-                                    "Delay_-_15_seconds_before_rechecking_admin_user": {
-                                        "runAfter": {
-                                            "HTTP_-_Check_admin_user_exists_in_Graph": [
-                                                "Failed",
-                                                "TimedOut"
-                                            ]
-                                        },
-                                        "type": "Wait",
-                                        "inputs": {
-                                            "interval": {
-                                                "count": 15,
-                                                "unit": "Second"
-                                            }
-                                        }
                                     }
                                 }
                             }

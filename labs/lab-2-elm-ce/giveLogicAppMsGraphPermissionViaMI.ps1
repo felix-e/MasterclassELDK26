@@ -33,6 +33,7 @@ $graphScopes = @(
   "EntitlementManagement.ReadWrite.All"
   "RoleManagement.ReadWrite.Directory"
   "Application.Read.All"
+  "UserAuthMethod-TAP.ReadWrite.All"
 )
 
 # Loop through each required Graph permission
@@ -81,7 +82,8 @@ $required = @(
   "Mail.Send",
   "EntitlementManagement.ReadWrite.All",
   "RoleManagement.ReadWrite.Directory",
-  "Application.Read.All"
+  "Application.Read.All",
+  "UserAuthMethod-TAP.ReadWrite.All"
 )
 
 $assigned = Get-MgServicePrincipalAppRoleAssignment -ServicePrincipalId $mi.Id -All |
@@ -126,3 +128,39 @@ Invoke-MgGraphRequest -Method POST -Uri $uri -Body $body -ContentType "applicati
   -PayloadPath "../../resources/resource-2-scim-sample-payloads/privileged-user-keepcove.json" |
   ConvertTo-Json -Depth 10 |
   fx
+
+
+
+
+
+
+
+  == last step issue ==
+Run this from terminal:                                                                                          
+                                                                                                                  
+```bash                                                                                                          
+MI_SP_ID="63d776b5-daec-424c-8eaf-214c4d546a87"                                                                
+                                                                                                                  
+GRAPH_SP_ID=$(az rest --method get \                                                                           
+     --url "https://graph.microsoft.com/v1.0/servicePrincipals?\$filter=appId eq                                  
+ '00000003-0000-0000-c000-000000000000'&\$select=id" \                                                            
+     --query "value[0].id" -o tsv)                                                                                
+                                                                                                                  
+TAP_APP_ROLE_ID="627169a8-8c15-451c-861a-5b80e383de5c" # UserAuthMethod-TAP.ReadWrite.All                      
+                                                                                                                  
+az rest --method post \                                                                                        
+--url "https://graph.microsoft.com/v1.0/servicePrincipals/$MI_SP_ID/appRoleAssignments" \                    
+--headers "Content-Type=application/json" \                                                                  
+--body "{\"principalId\":\"$MI_SP_ID\",\"resourceId\":\"$GRAPH_SP_ID\",\"appRoleId\":\"$TAP_APP_ROLE_ID\"}"  
+```                                                                                                              
+                                                                                                                  
+Then verify:                                                                                                     
+                                                                                                                  
+```bash                                                                                                          
+az rest --method get \                                                                                         
+--url "https://graph.microsoft.com/v1.0/servicePrincipals/$MI_SP_ID/appRoleAssignments" \                    
+--query "value[].appRoleId" -o tsv | grep 627169a8                                                           
+```                                                                                                              
+                                                                                                                  
+If that returns 627169a8-8c15-451c-861a-5b80e383de5c, the TAP permission is assigned.                            
+                                                                                      
