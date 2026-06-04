@@ -1,0 +1,21 @@
+Continue the Logic App / Entitlement Management troubleshooting session.
+
+We enabled MCP servers in /Users/felixelliott/Library/Application Support/Code/User/mcp.json:
+- Azure MCP was already present: com.microsoft/azure
+- Added Microsoft Learn Docs MCP: com.microsoft/learn-docs -> https://learn.microsoft.com/api/mcp
+
+Current issue:
+Logic App 2ProvisionAdmin uses user-assigned MI entraLabInstance:
+resource ID:
+/subscriptions/41f018dd-427b-445f-9262-6b32b603662e/resourcegroups/entraLab/providers/Microsoft.ManagedIdentity/userAssignedIdentities/entraLabInstance
+
+The Graph /resume call now authenticates, but returns:
+InvalidCustomExtensionStageInstanceId
+
+We already fixed:
+- customExtensionStageInstanceId is no longer empty
+- HTTP actions explicitly use user-assigned MI
+- UPN mapping changed from @identity-man.eu/@jacobsaa.onmicrosoft.com to @lab.keepcove.com/@felixelliottoutlookcom.onmicrosoft.com
+
+Next investigation:
+Use Microsoft Learn Docs MCP / Graph skill to verify Entitlement Management custom extension callback behavior, especially whether /resume should use CallbackUriPath and whether the custom extension must be configured as wait-for-callback.

@@ -1,0 +1,50 @@
+== Jun 4, 12: 22: 07 PM ==
+
+{
+    "uri": "https://graph.microsoft.com/v1.0/identityGovernance/entitlementManagement/assignmentRequests/a707cea9-9c97-467c-b6f9-a1173f6e268e/resume",
+    "method": "POST",
+    "headers": {
+        "Content-Type": "application/json"
+    },
+    "authentication": {
+        "audience": "https://graph.microsoft.com",
+        "type": "ManagedServiceIdentity"
+    },
+    "body": {
+        "data": {
+            "customExtensionStageInstanceDetail": "Admin account has been created",
+            "customExtensionStageInstanceId": "9228c2bd-6fc3-47dc-8f71-b9ecc7000fe8",
+            "stage": "assignmentRequestGranted",
+            "@odata.type": "microsoft.graph.accessPackageAssignmentRequestCallbackData"
+        },
+        "source": "IdentityMan.AdminAccountRequest",
+        "type": "microsoft.graph.accessPackageCustomExtensionStage.assignmentRequestGranted"
+    }
+}
+
+
+
+
+== Jun 4, 11: 57: 56 AM ==
+
+{
+    "uri": "https://graph.microsoft.com/v1.0/identityGovernance/entitlementManagement/assignmentRequests/31ad64fd-743f-4992-bb48-5a9745f29e7e/resume",
+    "method": "POST",
+    "headers": {
+        "Content-Type": "application/json"
+    },
+    "authentication": {
+        "audience": "https://graph.microsoft.com",
+        "type": "ManagedServiceIdentity"
+    },
+    "body": {
+        "data": {
+            "customExtensionStageInstanceDetail": "Admin account has been created",
+            "customExtensionStageInstanceId": "a12b2130-0c96-431e-bbdd-a083819f62df",
+            "stage": "assignmentRequestGranted",
+            "@odata.type": "microsoft.graph.accessPackageAssignmentRequestCallbackData"
+        },
+        "source": "IdentityMan.AdminAccountRequest",
+        "type": "microsoft.graph.accessPackageCustomExtensionStage.assignmentRequestGranted"
+    }
+}

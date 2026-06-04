@@ -1,8 +1,5 @@
 {
     "definition": {
-        "metadata": {
-            "notes": {}
-        },
         "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
         "contentVersion": "1.0.0.0",
         "triggers": {
@@ -168,41 +165,24 @@
         },
         "actions": {
             "Condition": {
-                "type": "If",
-                "expression": {
-                    "and": [
-                        {
-                            "equals": [
-                                "@triggerBody()?['AccessPackageCatalog']?['Id']",
-                                "a6461768-60ea-4a25-9863-6ec4cba55e93"
-                            ]
-                        }
-                    ]
-                },
                 "actions": {
                     "Condition_2": {
-                        "type": "If",
-                        "expression": {
-                            "and": [
-                                {
-                                    "equals": [
-                                        "@triggerBody()?['Stage']",
-                                        "assignmentRequestGranted"
-                                    ]
-                                }
-                            ]
-                        },
                         "actions": {
                             "Compose_-_UserPrincipalName": {
-                                "type": "Compose",
-                                "inputs": "adm.@{replace(body('Parse_JSON_-_Get_all_user_details')?['userPrincipalName'],'@identity-man.eu','@jacobsaa.onmicrosoft.com')}",
                                 "runAfter": {
                                     "Parse_JSON_-_Get_all_user_details": [
                                         "Succeeded"
                                     ]
-                                }
+                                },
+                                "type": "Compose",
+                                "inputs": "adm.@{replace(body('Parse_JSON_-_Get_all_user_details')?['userPrincipalName'],'@lab.keepcove.com','@felixelliottoutlookcom.onmicrosoft.com')}"
                             },
                             "HTTP_-_Generate_TAP_for_admin": {
+                                "runAfter": {
+                                    "HTTP_-_Enable_Exchange_Online_plus_addressing": [
+                                        "Succeeded"
+                                    ]
+                                },
                                 "type": "Http",
                                 "inputs": {
                                     "uri": "https://graph.microsoft.com/beta/users/@{outputs('Compose_-_UserPrincipalName')}/authentication/temporaryAccessPassMethods",
@@ -216,13 +196,9 @@
                                     },
                                     "authentication": {
                                         "type": "ManagedServiceIdentity",
+                                        "identity": "/subscriptions/41f018dd-427b-445f-9262-6b32b603662e/resourcegroups/entraLab/providers/Microsoft.ManagedIdentity/userAssignedIdentities/entraLabInstance",
                                         "audience": "https://graph.microsoft.com"
                                     }
-                                },
-                                "runAfter": {
-                                    "HTTP_-_Enable_Exchange_Online_plus_addressing": [
-                                        "Succeeded"
-                                    ]
                                 },
                                 "runtimeConfiguration": {
                                     "contentTransfer": {
@@ -237,7 +213,8 @@
                                     "method": "GET",
                                     "authentication": {
                                         "audience": "https://graph.microsoft.com",
-                                        "type": "ManagedServiceIdentity"
+                                        "type": "ManagedServiceIdentity",
+                                        "identity": "/subscriptions/41f018dd-427b-445f-9262-6b32b603662e/resourcegroups/entraLab/providers/Microsoft.ManagedIdentity/userAssignedIdentities/entraLabInstance"
                                     }
                                 },
                                 "runtimeConfiguration": {
@@ -247,6 +224,11 @@
                                 }
                             },
                             "Parse_JSON_-_Generate_TAP_for_admin": {
+                                "runAfter": {
+                                    "HTTP_-_Generate_TAP_for_admin": [
+                                        "Succeeded"
+                                    ]
+                                },
                                 "type": "ParseJson",
                                 "inputs": {
                                     "content": "@body('HTTP_-_Generate_TAP_for_admin')",
@@ -282,14 +264,14 @@
                                         },
                                         "type": "object"
                                     }
-                                },
-                                "runAfter": {
-                                    "HTTP_-_Generate_TAP_for_admin": [
-                                        "Succeeded"
-                                    ]
                                 }
                             },
                             "Parse_JSON_-_Get_all_user_details": {
+                                "runAfter": {
+                                    "HTTP_-_Get_all_user_details": [
+                                        "Succeeded"
+                                    ]
+                                },
                                 "type": "ParseJson",
                                 "inputs": {
                                     "content": "@body('HTTP_-_Get_all_user_details')",
@@ -323,14 +305,14 @@
                                         },
                                         "type": "object"
                                     }
-                                },
-                                "runAfter": {
-                                    "HTTP_-_Get_all_user_details": [
-                                        "Succeeded"
-                                    ]
                                 }
                             },
                             "HTTP_-_Send_an_email": {
+                                "runAfter": {
+                                    "Parse_JSON_-_Generate_TAP_for_admin": [
+                                        "Succeeded"
+                                    ]
+                                },
                                 "type": "Http",
                                 "inputs": {
                                     "uri": "https://graph.microsoft.com/v1.0/users/77ca8b96-893b-4f5b-a3f0-369beeaedf5a/sendMail",
@@ -354,13 +336,9 @@
                                     },
                                     "authentication": {
                                         "type": "ManagedServiceIdentity",
-                                        "audience": "https://graph.microsoft.com"
+                                        "audience": "https://graph.microsoft.com",
+                                        "identity": "/subscriptions/41f018dd-427b-445f-9262-6b32b603662e/resourcegroups/entraLab/providers/Microsoft.ManagedIdentity/userAssignedIdentities/entraLabInstance"
                                     }
-                                },
-                                "runAfter": {
-                                    "Parse_JSON_-_Generate_TAP_for_admin": [
-                                        "Succeeded"
-                                    ]
                                 },
                                 "runtimeConfiguration": {
                                     "contentTransfer": {
@@ -369,18 +347,23 @@
                                 }
                             },
                             "Set_variable_-_Request_Body_Provisioning": {
-                                "type": "SetVariable",
-                                "inputs": {
-                                    "name": "RequestBodyProvisioning",
-                                    "value": "{\n    \"schemas\":  [\n                    \"urn:ietf:params:scim:api:messages:2.0:BulkRequest\"\n                ],\n    \"Operations\":  [\n                       {\n                           \"method\":  \"POST\",\n                           \"bulkId\":  \"@{variables('GeneratedPassword')}\",\n                           \"path\":  \"/Users\",\n                           \"data\":  {\n                                        \"schemas\":  [\n                                                        \"urn:ietf:params:scim:schemas:core:2.0:User\",\n                                                        \"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\"\n                                                    ],\n                                        \"nickName\":  \"@{body('Parse_JSON_-_Get_all_user_details')?['mailNickname']}\",\n                                        \"userName\":  \"@{outputs('Compose_-_UserPrincipalName')}\",\n                                        \"displayName\":  \"@{body('Parse_JSON_-_Get_all_user_details')?['displayName']} - Admin\",\n                                        \"emails\":  [\n                                                       {\n                                                            \"value\": \"@{body('Parse_JSON_-_Get_all_user_details')?['mailNickname']}+admin@identity-man.eu\",\n                                                            \"type\": \"work\",\n                                                            \"primary\": true\n                                                       }\n                                                   ],\n                                        \"name\":  {\n                                                     \"familyName\":  \"@{body('Parse_JSON_-_Get_all_user_details')?['surname']}\",\n                                                     \"givenName\":  \"@{body('Parse_JSON_-_Get_all_user_details')?['givenName']}\"\n                                                 },\n                                        \"externalId\":  \"A@{body('Parse_JSON_-_Get_all_user_details')?['employeeId']}\",\n                                        \"active\":  true\n                                    }\n                       }\n                   ],\n    \"failOnErrors\":  null\n}"
-                                },
                                 "runAfter": {
                                     "Compose_-_UserPrincipalName": [
                                         "Succeeded"
                                     ]
+                                },
+                                "type": "SetVariable",
+                                "inputs": {
+                                    "name": "RequestBodyProvisioning",
+                                    "value": "{\n    \"schemas\":  [\n                    \"urn:ietf:params:scim:api:messages:2.0:BulkRequest\"\n                ],\n    \"Operations\":  [\n                       {\n                           \"method\":  \"POST\",\n                           \"bulkId\":  \"@{variables('GeneratedPassword')}\",\n                           \"path\":  \"/Users\",\n                           \"data\":  {\n                                        \"schemas\":  [\n                                                        \"urn:ietf:params:scim:schemas:core:2.0:User\",\n                                                        \"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User\"\n                                                    ],\n                                        \"nickName\":  \"@{body('Parse_JSON_-_Get_all_user_details')?['mailNickname']}\",\n                                        \"userName\":  \"@{outputs('Compose_-_UserPrincipalName')}\",\n                                        \"displayName\":  \"@{body('Parse_JSON_-_Get_all_user_details')?['displayName']} - Admin\",\n                                        \"emails\":  [\n                                                       {\n                                                            \"value\": \"@{body('Parse_JSON_-_Get_all_user_details')?['mailNickname']}+admin@identity-man.eu\",\n                                                            \"type\": \"work\",\n                                                            \"primary\": true\n                                                       }\n                                                   ],\n                                        \"name\":  {\n                                                     \"familyName\":  \"@{body('Parse_JSON_-_Get_all_user_details')?['surname']}\",\n                                                     \"givenName\":  \"@{body('Parse_JSON_-_Get_all_user_details')?['givenName']}\"\n                                                 },\n                                        \"externalId\":  \"A@{body('Parse_JSON_-_Get_all_user_details')?['employeeId']}\",\n                                        \"active\":  true\n                                    }\n                       }\n                   ],\n    \"failOnErrors\":  null\n}"
                                 }
                             },
                             "HTTP_-_Provision_admin_account": {
+                                "runAfter": {
+                                    "Set_variable_-_Request_Body_Provisioning": [
+                                        "Succeeded"
+                                    ]
+                                },
                                 "type": "Http",
                                 "inputs": {
                                     "uri": "https://graph.microsoft.com/v1.0/servicePrincipals/c3f0a750-3a78-4507-a30f-36f3ea3479e4/synchronization/jobs/API2AAD.ad7aaf9de4784d3f99aace450535d9cc.7cbfb5f7-2635-4a01-b793-c4f646ae4a9f/bulkUpload",
@@ -391,13 +374,9 @@
                                     "body": "@variables('RequestBodyProvisioning')",
                                     "authentication": {
                                         "type": "ManagedServiceIdentity",
+                                        "identity": "/subscriptions/41f018dd-427b-445f-9262-6b32b603662e/resourcegroups/entraLab/providers/Microsoft.ManagedIdentity/userAssignedIdentities/entraLabInstance",
                                         "audience": "https://graph.microsoft.com"
                                     }
-                                },
-                                "runAfter": {
-                                    "Set_variable_-_Request_Body_Provisioning": [
-                                        "Succeeded"
-                                    ]
                                 },
                                 "runtimeConfiguration": {
                                     "contentTransfer": {
@@ -406,6 +385,11 @@
                                 }
                             },
                             "HTTP_-_Enable_Exchange_Online_plus_addressing": {
+                                "runAfter": {
+                                    "Delay_-_20_seconds": [
+                                        "Succeeded"
+                                    ]
+                                },
                                 "type": "Http",
                                 "inputs": {
                                     "uri": "https://graph.microsoft.com/beta/users/@{outputs('Compose_-_UserPrincipalName')}",
@@ -415,13 +399,9 @@
                                     },
                                     "authentication": {
                                         "type": "ManagedServiceIdentity",
+                                        "identity": "/subscriptions/41f018dd-427b-445f-9262-6b32b603662e/resourcegroups/entraLab/providers/Microsoft.ManagedIdentity/userAssignedIdentities/entraLabInstance",
                                         "audience": "https://graph.microsoft.com"
                                     }
-                                },
-                                "runAfter": {
-                                    "Delay_-_20_seconds": [
-                                        "Succeeded"
-                                    ]
                                 },
                                 "runtimeConfiguration": {
                                     "contentTransfer": {
@@ -430,13 +410,6 @@
                                 }
                             },
                             "Delay_-_20_seconds": {
-                                "type": "Wait",
-                                "inputs": {
-                                    "interval": {
-                                        "count": 20,
-                                        "unit": "Second"
-                                    }
-                                },
                                 "runAfter": {
                                     "HTTP_-_Provision_admin_account": [
                                         "Succeeded",
@@ -444,24 +417,58 @@
                                         "Skipped",
                                         "Failed"
                                     ]
+                                },
+                                "type": "Wait",
+                                "inputs": {
+                                    "interval": {
+                                        "count": 20,
+                                        "unit": "Second"
+                                    }
                                 }
                             }
                         },
                         "else": {
                             "actions": {}
-                        }
+                        },
+                        "expression": {
+                            "and": [
+                                {
+                                    "equals": [
+                                        "@triggerBody()?['Stage']",
+                                        "assignmentRequestGranted"
+                                    ]
+                                }
+                            ]
+                        },
+                        "type": "If"
                     }
-                },
-                "else": {
-                    "actions": {}
                 },
                 "runAfter": {
                     "Initialize_variables_-_RequestBodyProvisioning": [
                         "Succeeded"
                     ]
-                }
+                },
+                "else": {
+                    "actions": {}
+                },
+                "expression": {
+                    "and": [
+                        {
+                            "equals": [
+                                "@triggerBody()?['AccessPackageCatalog']?['Id']",
+                                "a6461768-60ea-4a25-9863-6ec4cba55e93"
+                            ]
+                        }
+                    ]
+                },
+                "type": "If"
             },
             "HTTP_-_Resume_an_access_package_assignment_request": {
+                "runAfter": {
+                    "Condition": [
+                        "Succeeded"
+                    ]
+                },
                 "type": "Http",
                 "inputs": {
                     "uri": "https://graph.microsoft.com/v1.0/identityGovernance/entitlementManagement/assignmentRequests/@{triggerBody()?['AccessPackageAssignmentRequestId']}/resume",
@@ -481,13 +488,9 @@
                     },
                     "authentication": {
                         "audience": "https://graph.microsoft.com",
-                        "type": "ManagedServiceIdentity"
+                        "type": "ManagedServiceIdentity",
+                        "identity": "/subscriptions/41f018dd-427b-445f-9262-6b32b603662e/resourcegroups/entraLab/providers/Microsoft.ManagedIdentity/userAssignedIdentities/entraLabInstance"
                     }
-                },
-                "runAfter": {
-                    "Condition": [
-                        "Succeeded"
-                    ]
                 },
                 "operationOptions": "DisableAsyncPattern",
                 "runtimeConfiguration": {
@@ -497,6 +500,13 @@
                 }
             },
             "HTTP_-_Resume_and_deny_an_access_package_assignment_request": {
+                "runAfter": {
+                    "Condition": [
+                        "TimedOut",
+                        "Skipped",
+                        "Failed"
+                    ]
+                },
                 "type": "Http",
                 "inputs": {
                     "uri": "https://graph.microsoft.com/v1.0/identityGovernance/entitlementManagement/assignmentRequests/@{triggerBody()?['AccessPackageAssignmentRequestId']}/resume",
@@ -516,15 +526,9 @@
                     },
                     "authentication": {
                         "audience": "https://graph.microsoft.com",
-                        "type": "ManagedServiceIdentity"
+                        "type": "ManagedServiceIdentity",
+                        "identity": "/subscriptions/41f018dd-427b-445f-9262-6b32b603662e/resourcegroups/entraLab/providers/Microsoft.ManagedIdentity/userAssignedIdentities/entraLabInstance"
                     }
-                },
-                "runAfter": {
-                    "Condition": [
-                        "TimedOut",
-                        "Skipped",
-                        "Failed"
-                    ]
                 },
                 "operationOptions": "DisableAsyncPattern",
                 "runtimeConfiguration": {
@@ -534,6 +538,7 @@
                 }
             },
             "Initialize_variable_-_Guid": {
+                "runAfter": {},
                 "type": "InitializeVariable",
                 "inputs": {
                     "variables": [
@@ -543,10 +548,14 @@
                             "value": "@{guid()}"
                         }
                     ]
-                },
-                "runAfter": {}
+                }
             },
             "Initialize_variables_-_RequestBodyProvisioning": {
+                "runAfter": {
+                    "Initialize_variable_-_Guid": [
+                        "Succeeded"
+                    ]
+                },
                 "type": "InitializeVariable",
                 "inputs": {
                     "variables": [
@@ -554,11 +563,6 @@
                             "name": "RequestBodyProvisioning",
                             "type": "string"
                         }
-                    ]
-                },
-                "runAfter": {
-                    "Initialize_variable_-_Guid": [
-                        "Succeeded"
                     ]
                 }
             }
@@ -569,6 +573,9 @@
                 "type": "Object",
                 "defaultValue": {}
             }
+        },
+        "metadata": {
+            "notes": {}
         }
     },
     "parameters": {

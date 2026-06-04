@@ -9,7 +9,10 @@ Connect-MgGraph -Scopes `
 
 # Paste the Object ID from:
 # Logic App → Identity → System assigned → Object ID
-$miId = "7a8a4bd9-3167-42be-9008-4e5cfce0c37a"
+# $miId = "7a8a4bd9-3167-42be-9008-4e5cfce0c37a"
+
+# real managed identity object id for lab "entraLabInstance"
+$miId = "63d776b5-daec-424c-8eaf-214c4d546a87"
 
 # Retrieve the service principal object for the Logic App's managed identity
 $mi = Get-MgServicePrincipal -ServicePrincipalId $miId
