@@ -1,4 +1,4 @@
-import { streamText, tool } from "ai";
+import { generateText, tool } from "ai";
 import ky from "ky";
 import { z } from "zod";
 import * as msal from "@azure/msal-node";
@@ -524,6 +524,20 @@ async function getUserInfo(apiToken: string) {
   }
 }
 
+const AGENT0_MODEL_FALLBACKS = ["gpt-4o-mini", "gpt-4.1-mini", "gpt-4o"] as const;
+
+function textToDataStream(text: string): ReadableStream<Uint8Array> {
+  const encoder = new TextEncoder();
+
+  return new ReadableStream({
+    start(controller) {
+      // The client parses Vercel AI data stream text chunks as: 0:"...".
+      controller.enqueue(encoder.encode(`0:${JSON.stringify(text)}\n`));
+      controller.close();
+    },
+  });
+}
+
 export async function agent0(messages: Message[], token: string) {
   const getUserInfoTool = tool({
     description: "Get information about the logged in user",
@@ -531,15 +545,34 @@ export async function agent0(messages: Message[], token: string) {
     execute: async () => await getUserInfo(token),
   });
 
-  const stream = streamText({
-    model: openai("gpt-4-turbo"),
-    maxSteps: 5,
-    tools: {
-      getUserInfo: getUserInfoTool,
-    },
-    system: "assistant",
-    messages: messages,
-  });
+  let lastError: unknown;
 
-  return stream;
+  for (const modelName of AGENT0_MODEL_FALLBACKS) {
+    try {
+      console.log(`Agent0: trying OpenAI model ${modelName}`);
+
+      const result = await generateText({
+        model: openai(modelName),
+        maxSteps: 5,
+        tools: {
+          getUserInfo: getUserInfoTool,
+        },
+        system: "assistant",
+        messages: messages,
+      });
+
+      console.log(`Agent0: successfully generated response with ${modelName}`);
+
+      return {
+        toDataStream: () => textToDataStream(result.text),
+      };
+    } catch (error) {
+      lastError = error;
+      console.error(`Agent0: model ${modelName} failed, trying fallback if available`, error);
+    }
+  }
+
+  throw lastError instanceof Error
+    ? lastError
+    : new Error("All configured Agent0 OpenAI model fallbacks failed");
 }

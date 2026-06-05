@@ -221,14 +221,20 @@ export default function ChatRoute() {
       })
 
       if (!response.ok) {
+        const responseText = await response.text().catch(() => '')
+
         if (response.status === 401) {
           console.error(
-            'Unauthorized: Check API permissions or token validity.'
+            'Unauthorized: Check API permissions or token validity.',
+            responseText
           )
         } else {
-          console.error('API responded with status:', response.status)
+          console.error('API responded with status:', response.status, responseText)
         }
-        throw new Error('Failed to send message')
+
+        throw new Error(
+          `API request failed with status ${response.status}${responseText ? `: ${responseText}` : ''}`
+        )
       }
 
       const reader = response.body?.getReader()
@@ -303,7 +309,9 @@ export default function ChatRoute() {
 
         const errorMessage: Message = {
           id: (Date.now() + 1).toString(),
-          content: 'Sorry, I encountered an error. Please try again.',
+          content: import.meta.env.DEV && error instanceof Error
+            ? `Sorry, I encountered an error. ${error.message}`
+            : 'Sorry, I encountered an error. Please try again.',
           role: 'assistant',
         }
 

@@ -15,17 +15,28 @@ const root = createRoot(document.getElementById('root') as HTMLElement)
 const entraTenantId = import.meta.env.VITE_ENTRA_TENANT_ID
 const entraClientId = import.meta.env.VITE_ENTRA_CLIENT_ID
 
-root.render(
-  <StrictMode>
-    <BrowserRouter>
-      {!entraTenantId || !entraClientId ? (
-        <EntraConfigError />
-      ) : (
-        <MsalProvider instance={msalInstance}>
-          <Toaster />
-          <App />
-        </MsalProvider>
-      )}
-    </BrowserRouter>
-  </StrictMode>
-)
+async function start() {
+  if (entraTenantId && entraClientId) {
+    await msalInstance.initialize()
+  }
+
+  root.render(
+    <StrictMode>
+      <BrowserRouter>
+        {!entraTenantId || !entraClientId ? (
+          <EntraConfigError />
+        ) : (
+          <MsalProvider instance={msalInstance}>
+            <Toaster />
+            <App />
+          </MsalProvider>
+        )}
+      </BrowserRouter>
+    </StrictMode>
+  )
+}
+
+start().catch((error) => {
+  console.error('Failed to initialize MSAL', error)
+  root.render(<EntraConfigError />)
+})
