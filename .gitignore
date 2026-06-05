@@ -34,6 +34,12 @@ lerna-debug.log*
 # Ignore Husky hooks (optional)
 .husky/_
 
+# Ignore generated Maester test/scripts content, but keep run results for lab evidence
+**/maester-tests/**
+!**/maester-tests/
+!**/maester-tests/test-results/
+!**/maester-tests/test-results/**
+
 # Ignore lint-staged cache (optional)
 .lintstagedrc
 

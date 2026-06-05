@@ -32,11 +32,11 @@ Use the following structure to define your break-glass accounts:
   "GlobalSettings": {
     "EmergencyAccessAccounts": [
       {
-        "Id": "59780ce8-d2f3-4e41-a491-6c327a75879d",
+        "Id": "d817a28c-50c5-4e14-99b5-b83dd5853790",
         "Type": "User"
       },
       {
-        "Id": "7c1c1467-e16f-4039-a0f7-8e3e2d0d3848",
+        "Id": "70ea042f-a152-4322-b505-2878d2a804f5",
         "Type": "User"
       }
     ]
